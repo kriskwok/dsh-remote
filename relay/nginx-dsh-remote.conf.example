@@ -7,7 +7,7 @@
 #   :443   可选 SNI 兜底（公共 WiFi 常只放 443；插件隧道 3443 不通时走它）
 #
 # 实际生效的配置见同目录 nginx-dsh-mac.live.conf / nginx-dsh-mac-443.live.conf。
-# 把下面的 <YOUR-DOMAIN> 换成 dsh.czwyf.ltd、证书路径换成实际路径即可。
+# 把下面的 <YOUR-DOMAIN> 换成你的域名（如 dsh.example.com）、证书路径换成实际路径即可。
 # ─────────────────────────────────────────────────────────────────────────────
 
 # WebSocket 升级映射（http 块级别；若已有同名/等价 map 不要重复定义）
