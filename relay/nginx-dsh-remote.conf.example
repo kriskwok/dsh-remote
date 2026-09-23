@@ -1,0 +1,71 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# dsh-remote nginx 配置模板
+#
+# 端口规划（本机实际部署）：
+#   :3080  服务器本机自己的 dsh（dsh-web vhost，保持不动）
+#   :3443  Mac DSH 统一入口 → relay 127.0.0.1:3090（App 固定地址，必装）
+#   :443   可选 SNI 兜底（公共 WiFi 常只放 443；插件隧道 3443 不通时走它）
+#
+# 实际生效的配置见同目录 nginx-dsh-mac.live.conf / nginx-dsh-mac-443.live.conf。
+# 把下面的 <YOUR-DOMAIN> 换成 dsh.czwyf.ltd、证书路径换成实际路径即可。
+# ─────────────────────────────────────────────────────────────────────────────
+
+# WebSocket 升级映射（http 块级别；若已有同名/等价 map 不要重复定义）
+map $http_upgrade $dsh_mac_conn_upgrade {
+    default upgrade;
+    ''      close;
+}
+
+# ── 主入口：3443 ──────────────────────────────────────────────────────────────
+server {
+    listen 3443 ssl;
+    listen [::]:3443 ssl;
+    http2 off;
+    server_name <YOUR-DOMAIN>;
+    client_max_body_size 50m;
+
+    ssl_certificate     /etc/ssl/<YOUR-DOMAIN>/fullchain.pem;
+    ssl_certificate_key /etc/ssl/<YOUR-DOMAIN>/privkey.pem;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $dsh_mac_conn_upgrade;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 86400s;
+    proxy_send_timeout 86400s;
+    proxy_buffering off;
+
+    # 电脑插件外拨隧道端点（Bearer 鉴权在 relay 完成）
+    location = /relay/ws { proxy_pass http://127.0.0.1:3090; }
+    # 其余全部是 App 流量（relay 自动在 LAN 直连 / 隧道间选路）
+    location /          { proxy_pass http://127.0.0.1:3090; }
+}
+
+# ── 可选兜底：443 SNI vhost（与 443 上既有站点按 server_name 共存）────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 off;
+    server_name <YOUR-DOMAIN>;
+    client_max_body_size 50m;
+
+    ssl_certificate     /etc/ssl/<YOUR-DOMAIN>/fullchain.pem;
+    ssl_certificate_key /etc/ssl/<YOUR-DOMAIN>/privkey.pem;
+
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $dsh_mac_conn_upgrade;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 86400s;
+    proxy_send_timeout 86400s;
+    proxy_buffering off;
+
+    location = /relay/ws { proxy_pass http://127.0.0.1:3090; }
+    location /          { proxy_pass http://127.0.0.1:3090; }
+}

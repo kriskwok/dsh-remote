@@ -1,0 +1,61 @@
+{
+  "name": "dsh-remote",
+  "version": "0.1.0",
+  "description": "DSH 远程访问插件：本机代理 + 服务器中继，局域网走服务器反代、外网走服务器隧道，App 始终用同一个固定入口无感访问电脑上的 DSH；插件设置内置在「设置 → 插件」里。",
+  "type": "module",
+  "main": "lib/index.js",
+  "bin": {
+    "dsh-remote": "bin/dsh-remote.mjs"
+  },
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": "./lib/client.js",
+    "./relay": "./relay/server.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "relay",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test --test-timeout=30000 \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "remote",
+    "tunnel",
+    "relay",
+    "mobile"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kriskwok/dsh-remote.git"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  }
+}

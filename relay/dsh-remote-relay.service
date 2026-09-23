@@ -1,0 +1,22 @@
+[Unit]
+Description=dsh-remote relay (DSH 中继：局域网反代 + 外网隧道)
+Documentation=https://github.com/kriskwok/dsh-ios-app/tree/main/dsh-remote
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/dsh-remote
+EnvironmentFile=/opt/dsh-remote/relay.env
+ExecStart=/usr/bin/node /opt/dsh-remote/relay/server.mjs
+Restart=always
+RestartSec=3
+# 安全加固（按需保留）
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

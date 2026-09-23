@@ -1,0 +1,6 @@
+# dsh-remote bundle layer
+# 由 `dsh plugin --profile <name> add` 安装时应用：向 profile 组合插入本插件行。
+# 纯 node 侧插件：本机 loopback 改写代理 + 到中继服务器的外拨隧道，无 client 半。
+- insert:
+    - id: remote
+      name: 'dsh-remote'
