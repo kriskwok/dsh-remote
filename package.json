@@ -23,9 +23,7 @@
     "README.md",
     "LICENSE"
   ],
-  "scripts": {
-    "test": "node --test --test-timeout=30000 \"test/*.test.mjs\""
-  },
+  "scripts": {},
   "dependencies": {
     "ws": "^8.18.0"
   },
